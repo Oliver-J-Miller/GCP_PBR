@@ -1,0 +1,115 @@
+#version 430 core
+// This is the fragment shader
+// The program in this file will be run separately for each fragment (pixel) that is drawn
+
+// These are the per-fragment inputs
+// They must match with the outputs of the vertex shader
+in vec3 eyeSpaceNormalV;
+in vec3 eyeSpaceLightPosV;
+in vec3 eyeSpaceVertPosV;
+
+// These variables will be the same for every vertex in the model
+// They are mostly material and light properties
+// We provide default values in case the program doesn't set them
+uniform vec3 lightColour = {1,1,1};
+uniform vec3 emissiveColour = {0,0,0};
+uniform vec3 ambientColour  = {0.1f,0.1f,0.2f};
+uniform vec3 diffuseColour  = {0.8f,0.1f,0.1f};
+uniform vec3 specularColour = {0.0f,1.0f,0.0f};
+uniform float shininess     = 50.0f;
+uniform float roughness     = 0.1f;
+uniform float metalness		= 0.1f;
+uniform float alpha         = 1.0f;
+uniform float PI			= 3.14159265359;
+
+uniform vec3 albedo = vec3(0.5);
+uniform float ao;
+
+// This is the output, it is the fragment's (pixel's) colour
+out vec4 fragColour;
+
+// The actual program, which will run on the graphics card
+float DistributionGGX(vec3 _n, vec3 _h, float _a)
+{
+	float a2 = _a*_a;
+	float NdotH = max(dot(_n, _h), 0.0);
+	float NdotH2 = NdotH*NdotH;
+
+	float denom = (NdotH2 * (a2-1.0)+1.0);
+	denom = PI * denom * denom;
+
+	return a2 / denom;
+}
+
+float GeometrySchlickGGX(float NdotV, float _k)
+{
+	float r = (_k + 1.0);
+	float k = (r*r) / 8.0;
+
+	float denom = NdotV * (1.0 - k) +k;
+
+	return NdotV / denom;
+}
+
+float GeometrySmith(vec3 _n, vec3 _v, vec3 _l, float k)
+{
+	float NdotV = max(dot(_n, _v), 0.0);
+	float NdotL = max(dot(_n, _l), 0.0);
+	float ggx1 = GeometrySchlickGGX(NdotV, k);
+	float ggx2 = GeometrySchlickGGX(NdotL, k);
+
+	return ggx1 * ggx2;
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 f0)
+{
+	return f0 + (1.0 - f0) * pow(1.0 - cosTheta, 5.0);
+}
+
+void main()
+{
+	// This is the direction from the fragment to the light, in eye-space
+	vec3 lightDir = normalize( eyeSpaceLightPosV - eyeSpaceVertPosV );
+	// Re-normalise the normal just in case
+	vec3 normal = normalize( eyeSpaceNormalV );
+	vec3 eyeDir = normalize( -eyeSpaceVertPosV );
+	vec3 halfVec = normalize((eyeDir+lightDir)/2);
+	
+		float cosTheta = max(dot(halfVec, eyeDir), 0.0);
+		vec3 f0 = vec3(0.04);
+		f0 = mix(f0, diffuseColour.rgb, metalness);
+
+		vec3 radiance = lightColour; // To do attenuation
+
+		float NDF = DistributionGGX(normal, halfVec, roughness);
+		float Geom = GeometrySmith(normal,eyeDir,lightDir,roughness);
+		vec3 Fresnel = fresnelSchlick(max(dot(halfVec, eyeDir), 0.0), f0);
+
+		//vec3 numerator = mix(1,NDF, useSpecDist) * mix (1,Geom,useSpecGeom) * Fresnel;
+		vec3 numerator = NDF * Geom * Fresnel;
+		float denominator = 4.0* max(dot(normal, eyeDir), 0.0) * max(dot(normal, lightDir), 0.0) + 0.0001;
+		vec3 specular = numerator/ denominator;
+
+		vec3 kD = vec3(1.0) - Fresnel;
+		kD *= 1.0 - metalness;
+
+		float NdotL = max(dot(normal, lightDir), 0.0);
+		vec3 Lo;
+		Lo += (kD * albedo / PI + specular) * radiance * NdotL;
+		
+		vec3 ambient = ambientColour * albedo;
+	
+		// This is where you need to write your code!
+		//vec3 diffuse = diffuseColour * max(0,dot(normal,lightDir));
+		
+		vec3 diffuse = ((1-Fresnel) * albedo)/PI;
+		vec3 colour= (diffuse *diffuseColour +specular *specularColour) *radiance * NdotL;
+		
+		// This is where you need to write your code!
+		//vec3 specular = specularColour * lightColour * vec3(dot(normal,lightDir)>0) * pow(max(dot(normal,halfVec),0), shininess);
+		
+		// The final output colour is the emissive + ambient + diffuse + specular
+		//fragColour = vec4( emissiveColour + ambientColour + diffuse + specular, alpha);
+		
+		fragColour = vec4(emissiveColour + ambient + colour, alpha);
+}
