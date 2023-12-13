@@ -103,10 +103,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="fragShader.txt">
+    <Text Include="BlinnPhong.txt">
       <Filter>Shaders</Filter>
     </Text>
     <Text Include="vertShader.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="Lambert.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="Disney.txt">
       <Filter>Shaders</Filter>
     </Text>
   </ItemGroup>

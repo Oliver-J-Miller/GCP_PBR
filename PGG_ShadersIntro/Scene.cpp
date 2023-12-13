@@ -41,7 +41,7 @@ Scene::Scene()
 	// Set up the viewing matrix
 	// This represents the camera's orientation and position
 	_viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0,0,-3.5f) );
-	
+	_camPos = glm::inverse((_viewMatrix)[3]);
 
 	// Set up a projection matrix
 	_projMatrix = glm::perspective(45.0f, 1.0f, 0.1f, 100.0f);
@@ -167,7 +167,7 @@ bool Scene::CheckShaderCompiled( GLint shader )
 void Scene::BuildShaders()
 {
 	std::string vertFilename("vertShader.txt");
-	std::string fragFilename("fragShader.txt");
+	std::string fragFilename("BlinnPhong.txt");
 
 
 

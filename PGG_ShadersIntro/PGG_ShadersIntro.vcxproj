@@ -177,7 +177,9 @@
     <ClInclude Include="wglew.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="fragShader.txt" />
+    <Text Include="BlinnPhong.txt" />
+    <Text Include="Disney.txt" />
+    <Text Include="Lambert.txt" />
     <Text Include="vertShader.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

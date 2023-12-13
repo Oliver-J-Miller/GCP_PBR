@@ -85,7 +85,6 @@ void main()
 		float Geom = GeometrySmith(normal,eyeDir,lightDir,roughness);
 		vec3 Fresnel = fresnelSchlick(max(dot(halfVec, eyeDir), 0.0), f0);
 
-		//vec3 numerator = mix(1,NDF, useSpecDist) * mix (1,Geom,useSpecGeom) * Fresnel;
 		vec3 numerator = NDF * Geom * Fresnel;
 		float denominator = 4.0* max(dot(normal, eyeDir), 0.0) * max(dot(normal, lightDir), 0.0) + 0.0001;
 		vec3 specular = numerator/ denominator;
@@ -109,7 +108,8 @@ void main()
 		//vec3 specular = specularColour * lightColour * vec3(dot(normal,lightDir)>0) * pow(max(dot(normal,halfVec),0), shininess);
 		
 		// The final output colour is the emissive + ambient + diffuse + specular
-		//fragColour = vec4( emissiveColour + ambientColour + diffuse + specular, alpha);
 		
 		fragColour = vec4(emissiveColour + ambient + colour, alpha);
 }
+
+

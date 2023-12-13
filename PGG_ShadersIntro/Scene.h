@@ -57,6 +57,7 @@ protected:
 		
 	// All cubes share the same viewing matrix - this defines the camera's orientation and position
 	glm::mat4 _viewMatrix;
+	glm::vec3 _camPos;
 	
 	// The projection matrix defines the camera's view (like its lens)
 	glm::mat4 _projMatrix;

@@ -1,0 +1,25 @@
+// These variables will be the same for every vertex in the model
+// They are mostly material and light properties
+// We provide default values in case the program doesn't set them
+uniform vec3 lightColour = {1,1,1};
+uniform vec3 emissiveColour = {0,0,0};
+uniform vec3 ambientColour  = {0.1f,0.1f,0.2f};
+uniform vec3 diffuseColour  = {0.8f,0.1f,0.1f};
+uniform vec3 specularColour = {0.0f,1.0f,0.0f};
+uniform float shininess     = 50.0f;
+uniform float roughness     = 0.1f;
+uniform float metalness		= 0.1f;
+uniform float alpha         = 1.0f;
+uniform float PI			= 3.14159265359;
+
+uniform vec3 albedo = vec3(0.5);
+uniform float ao;
+
+// This is the output, it is the fragment's (pixel's) colour
+out vec4 fragColour;
+
+
+void main()
+{
+	fragColour = albedo/PI;
+}
